@@ -22,7 +22,7 @@
 %% in the same archive or directory.)
 %%
 %% The first command in your LaTeX source must be the \documentclass command.
-\documentclass[sigchi-a]{acmart}
+\documentclass[sigchi]{acmart}
 
 %%
 %% \BibTeX command to typeset BibTeX logo in the docs
@@ -114,7 +114,7 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-  Recent advances in positional tracking systems for virtual and augmented reality have opened up the possibility for ubiquitous motion capture technology in the consumer market. However, for many applications in performance art, athletics, neuroscience, and medicine, these systems remain too bulky and expensive for general use, and can track only a few objects at a time. In this work, we present the new cross-platform WebBLE interface and real-time in-browser visualization for the HiveTracker, a small wireless device that takes advantage of existing lighthouse tracking technology to provide affordable, scalable, and highly accurate positional tracking capabilities. We show how the new developments will reduce the setup costs and increase the broader accessibility of our tracking technology.
+  Recent advances in positional tracking systems for virtual and augmented reality have opened up the possibility for ubiquitous motion capture technology in the consumer market. However, for many applications in performance art, athletics, neuroscience, and medicine, these systems remain too bulky and expensive for general use, and can track only a few objects at a time. In this work, we present the new cross-platform BLE interface and real-time in-browser visualization for the HiveTracker, a small wireless device that takes advantage of existing lighthouse tracking technology to provide affordable, scalable, and highly accurate positional tracking capabilities. We show how the new developments will reduce the setup costs and increase the broader accessibility of our tracking technology.
 \end{abstract}
 
 %%
@@ -160,25 +160,37 @@ In this paper, we describe the further development of our prototype, and the mai
 \section{Contributions}
 
 \begin{itemize}
-  \item {\itshape Open-source firmware supporting} low-latency serial BLE communication protocol for any number of devices.
-  \item {\itshape BLE interface for 3D reconstruction and triangulation} of positional data from each device.
+  \item {\itshape Open-source firmware supporting} low-latency Bluetooth low energy (BLE) communication protocol.
+  \item {\itshape 3D reconstruction and triangulation} of positional data from each device.
   \item {\itshape Real-time JavaScript visualization} of reconstructed positioning data for rapid-prototyping and testing.
 \end{itemize}
 
 \section{Firmware}
 
-\begin{marginfigure}
+\begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{prototype}
   \caption{1907 Franklin Model D roadster. Photograph by Harris \&
     Ewing, Inc. [Public domain], via Wikimedia
     Commons. (\url{https://goo.gl/VLCRBB}).}
   \Description{The 1907 Franklin Model D roadster.}
-\end{marginfigure}
+\end{figure}
 
 \section{BLE interface}
 
+The nRF52 microcontroller provides a proprietary radio communication protocol for high-bandwidth communication with a computer, but also a BLE interface. Wireless BLE communication is attractive due to its low power requirements and growing acceptance as a standard in web development stacks. In our goal to make setting up and interfacing with HiveTracker devices more accessible, we decided to embed a lightweight BLE protocol in the device firmware, allowing direct pairing from any WebBLE enabled browser.
+
+\section{3D Reconstruction and triangulation}
+
+For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the basestation. However, it is often desirable to position the device relative to a common reference frame. In our previous work, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset.
+
+However, the basestation beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
+
+To calibrate our own reference, we use a HiveTracker device as the origin, with four photodiodes arranged in a known planar configuration. For each pair of photodiode hits from the same basestation, we recover two angles, from which we can reconstruct the line from the photodiode to the origin of each basestation.
+
 \section{Real-time visualization}
+
+To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library.
 
 \section{Future work}
 
