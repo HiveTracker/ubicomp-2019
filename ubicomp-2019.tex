@@ -1,17 +1,6 @@
-%%
-%% This is file `sample-sigchi.tex',
-%% generated with the docstrip utility.
-%%
-%% The original source files were:
-%%
-%% samples.dtx  (with options: `sigchi')
-%% 
 %% IMPORTANT NOTICE:
 %% 
 %% For the copyright see the source file.
-%% 
-%% Any modified versions of this file must be renamed
-%% with new filenames distinct from sample-sigchi.tex.
 %% 
 %% For distribution of the original source see the terms
 %% for copying and modification in the file samples.dtx.
@@ -23,6 +12,7 @@
 %%
 %% The first command in your LaTeX source must be the \documentclass command.
 \documentclass[sigchi]{acmart}
+\usepackage{cleveref}[2012/02/15]% v0.18.4; 
 
 %%
 %% \BibTeX command to typeset BibTeX logo in the docs
@@ -41,10 +31,7 @@
 \acmDOI{10.1145/1122445.1122456}
 
 %% These commands are for a PROCEEDINGS abstract or paper.
-\acmConference[Woodstock '18]{Woodstock '18: ACM Symposium on Neural
-  Gaze Detection}{June 03--05, 2018}{Woodstock, NY}
-\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
-  June 03--05, 2018, Woodstock, NY}
+\acmConference[UbiComp'19]{the ACM Conference on Ubiquitous Computing}{Sept 11--13, 2019}{London, UK}
 \acmPrice{15.00}
 \acmISBN{978-1-4503-9999-9/18/06}
 
@@ -57,25 +44,14 @@
 %%\acmSubmissionID{123-A56-BU3}
 
 %%
-%% The majority of ACM publications use numbered citations and
-%% references.  The command \citestyle{authoryear} switches to the
-%% "author year" style.
-%%
-%% If you are preparing content for an event
-%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
-%% citations and references.
-%% Uncommenting
-%% the next command will enable that style.
-%%\citestyle{acmauthoryear}
-
-%%
 %% end of the preamble, start of the body of the document source.
 \begin{document}
 
 %%
 %% The "title" command has an optional parameter,
 %% allowing the author to define a "short title" to be used in page headers.
-\title{HiveTracker: 3D Positioning for Ubiquitous Embedded Systems}
+\title{HiveTracker: Embedded 3d Positioning, Algorithms and Characterizations}
+%\title{HiveTracker: Embedded 3d Positioning, Algorithms and Characterizations}
 
 %%
 %% The "author" command and its associated commands are used to define
@@ -86,8 +62,7 @@
 \author{C\'edric Honnet}
 %\orcid{1234-5678-9012}
 \affiliation{%
-  \institution{Sorbonne University}
-  \department{UPMC, CNRS, ISIR}
+  \institution{Sorbonne University, ISIR, CNRS}
   \streetaddress{}
   \city{Paris}
   \country{France}}
@@ -101,6 +76,12 @@
   \country{United Kingdom}}
 \email{g.lopes@neurogears.org}
 
+\begin{teaserfigure}
+\centering
+\includegraphics[width=1.0\columnwidth]{Figures/banner.jpg}
+\caption{Left: the HTC Vive tracker - Right: our Hive Tracker miniaturization.}
+\label{Fig:Banner}
+\end{teaserfigure}
 
 %%
 %% By default, the full list of authors will be used in the page
@@ -114,7 +95,7 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-  Recent advances in positional tracking systems for virtual and augmented reality have opened up the possibility for ubiquitous motion capture technology in the consumer market. However, for many applications in performance art, athletics, neuroscience, and medicine, these systems remain too bulky and expensive for general use, and can track only a few objects at a time. In this work, we present the new cross-platform BLE interface and real-time in-browser visualization for the HiveTracker, a small wireless device that takes advantage of existing lighthouse tracking technology to provide affordable, scalable, and highly accurate positional tracking capabilities. We show how the new developments will reduce the setup costs and increase the broader accessibility of our tracking technology.
+  Recent advances in positional tracking systems for virtual and augmented reality have opened up the possibilities for ubiquitous motion capture technology in the consumer market. However, for many applications such as in performance art, athletics, neuroscience, and medicine, these systems remain too bulky and expensive for general use, and can track only a few objects at a time. In this work, we present a small wireless device that takes advantage of existing HTC Vive lighthouse tracking technology to provide affordable, scalable, and highly accurate positional tracking capabilities. This open hardware and open software project contains several elements, and the latest contributions described in this paper include: a characterization of the optical distortions of the lighthouses, a set of sensor fusion algorithms, a new cross-platform WebBLE interface, and a real-time in-browser visualization. We also introduce a new adaptive calibration using regression to estimate transformation matrices of lighthouses, and we propose an FPGA approach to allow more photodiodes, and adapt to the lighthouses V2. Finally, we show how the new developments will reduce the setup costs and increase the broader accessibility of our tracking technology.
 \end{abstract}
 
 %%
@@ -138,7 +119,7 @@
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{open-source, low cost, motion capture, wireless device, virtual reality, tracker}
+\keywords{Indoor Positioning, Open-source, Low Cost, Wireless Device, Virtual Reality, 3d Tracking}
 
 
 %%
@@ -146,68 +127,90 @@
 %% information and builds the first part of the formatted document.
 \maketitle
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 Robust real-time positional tracking systems have been the target of research for decades to support applications in natural user interfaces (NUI), virtual reality (VR) and augmented reality (AR). All of these interface paradigms require an accurate sampling of the spatial environment of a user, and have to be responsive in real-time in order to sustain the illusion of control. Recent developments in motion sensing and tracking technology for VR have finally moved the field of motion capture technology away from expensive custom engineered spaces with multiple cameras. The need to deploy VR at scale in the consumer market has pushed for scalable and cost-effective solutions, mostly through inside-out techniques using either computer vision based simultaneous localization and mapping (SLAM) or laser-based lighthouse approaches.
 
 Because each device is taking care of its own localization, such inside-out solutions are inherently scalable, allowing for a much larger number of devices to coexist in the same space. This has triggered many researchers to start rethinking the entire approach to full-body motion tracking, replacing the passive reflective beads with active inside-out devices. Unfortunately, size and accuracy remain a limitation for such motion capture applications. Inside-out SLAM based computer vision devices rely on cameras and expensive processors, which both make existing controllers more bulky and increase power requirements.
 
-An alternative solution to inside-out tracking is to use a beacon-based approach, such as the one used in the Valve Lighthouse tracking system. In this system, a lighthouse base station periodically sweeps the space with a laser at a fixed frequency. Photodiodes placed in tracked objects can detect these sweeps and using either information embedded in modulated light at the beam, or synchronization pulses, can reconstruct the exact angle at which the laser hit the object. Positioning information can be accurately recovered from the photodiodes as long as the timing of each laser hit can be sensed fast enough.
+\subsection{Principle}
+TODO: develop / illustrate?\\\\
+An alternative solution to inside-out tracking is to use a beacon-based approach, such as the one used in the HTC Vive Lighthouse tracking system. In this system, a lighthouse base station periodically sweeps the space with a laser at a fixed frequency. Photodiodes placed in tracked objects can detect these sweeps and using either information embedded in modulated light at the beam, or synchronization pulses, can reconstruct the exact angle at which the laser hit the object. Positioning information can be accurately recovered from the photodiodes as long as the timing of each laser hit can be sensed fast enough.
 
-In previous work, we explored the design of a PCB prototype called the HiveTracker \cite{Quinones2018}, that takes advantage of dedicated real-time sensing capabilities of the Nordic nRF52 microcontroller to sense the lighthouse light sweeps without requiring a dedicated FPGA. This allowed us to design an embedded device with up to five photodiodes that is small, accurate, and cheap enough for full-body motion tracking at scale.
+\subsection{Related work}
+In previous work, we explored the design of a prototype called the HiveTracker \cite{Quinones2018}, that takes advantage of a rare dedicated real-time and parallel processing feature in the nRF52 microcontroller made by Nordic Semi to sense the lighthouse light sweeps without requiring a dedicated FPGA. This allowed us to design an embedded device with up to five photodiodes that is small, accurate, and cheap enough for full-body motion tracking at scale. \newline \newline
+In this paper, we describe the further development of our prototype, and the main hardware and software challenges we had to overcome to increase the accessibility and ease of use of the HiveTracker beyond a proof-of-concept.
 
-In this paper, we describe the further development of our prototype, and the main hardware and software challenges we had to overcome to increase the accessibility and ease of use of the HiveTracker beyond a proof-of-concept research prototype.
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Contributions}
 
-\begin{itemize}
-  \item {\itshape Open-source firmware supporting} low-latency Bluetooth low energy (BLE) communication protocol.
-  \item {\itshape 3D reconstruction and triangulation} of positional data from each device.
-  \item {\itshape Real-time JavaScript visualization} of reconstructed positioning data for rapid-prototyping and testing.
-\end{itemize}
+%\begin{itemize}
+%  \item {\itshape Open-source firmware supporting} low-latency Bluetooth low energy (BLE) communication protocol.
+%  \item {\itshape 3D reconstruction and triangulation} of positional data from each device.
+%  \item {\itshape Real-time JavaScript visualization} of reconstructed positioning data for rapid-prototyping and testing.
+%\end{itemize}
 
-\section{Firmware}
+\subsection{Firmware}
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=\linewidth]{prototype}
-  \caption{1907 Franklin Model D roadster. Photograph by Harris \&
-    Ewing, Inc. [Public domain], via Wikimedia
-    Commons. (\url{https://goo.gl/VLCRBB}).}
-  \Description{The 1907 Franklin Model D roadster.}
-\end{figure}
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[width=\linewidth]{prototype}
+%   \caption{1907 Franklin Model D roadster. Photograph by Harris \&
+%     Ewing, Inc. [Public domain], via Wikimedia
+%     Commons. (\url{https://goo.gl/VLCRBB}).}
+%   \Description{The 1907 Franklin Model D roadster.}
+% \end{figure}
 
-\section{BLE interface}
+GitHub repository \cite{firmwareRepo}
+
+Arduino nano 33 ble \footnote{Arduino nano 33 ble: \url{https://store.arduino.cc/usa/nano-33-ble}} 
+
+\subsection{Optical distortion characterization}
+https://hackaday.io/project/160182-hivetracker/logs
+
+\subsection{Sensor fusion algorithms}
+ (Kalman and Madgwick)
+https://hackaday.io/project/160182-hivetracker/logs
+
+
+\subsection{BLE interface}
 
 The nRF52 microcontroller provides a proprietary radio communication protocol for high-bandwidth communication with a computer, but also a BLE interface. Wireless BLE communication is attractive due to its low power requirements and growing acceptance as a standard in web development stacks. In our goal to make setting up and interfacing with HiveTracker devices more accessible, we decided to embed a lightweight BLE protocol in the device firmware, allowing direct pairing from any WebBLE enabled browser.
 
-\section{3D Reconstruction and triangulation}
+More in the firmware \cite{firmwareRepo} and Web-App \cite{WebappRepo} repositories.
 
-For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the basestation. However, it is often desirable to position the device relative to a common reference frame. In our previous work, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset.
+TODO: opening => cite p5.ble.js\footnote{p5.ble.js by ITP-NYU: \url{https://ItpNyu.github.io/p5ble-website/}}
 
-However, the basestation beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
+\subsection{3D Reconstruction and triangulation}
 
-To calibrate our own reference, we use a HiveTracker device as the origin, with four photodiodes arranged in a known planar configuration. For each pair of photodiode hits from the same basestation, we recover two angles, from which we can reconstruct the line from the photodiode to the origin of each basestation.
+For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the base station. However, it is often desirable to position the device relative to a common reference frame. In our previous work, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset.
 
-\section{Real-time visualization}
+However, the base station beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
 
-To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library.
+To calibrate our own reference, we use a HiveTracker device as the origin, with four photodiodes arranged in a known planar configuration. For each pair of photodiode hits from the same base station, we recover two angles, from which we can reconstruct the line from the photodiode to the origin of each base station.
 
+\subsection{Real-time visualization}
+
+To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library. This cross-platform approach allows visualizing the 3d positions in any device running Chromium or Chrome:
+\\\\
+TODO: add illustration and reference to repository \cite{WebappRepo}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Future work}
 
-\section{Related work}
+\subsection{Adaptive calibration}
 
-\section{SIGCHI Extended Abstracts}
+TODO: Describe regression technique?\\
+https://photos.app.goo.gl/VDNVeL6PZ8ZNBSpi6
+\\\\
+TODO: cite poser algorithms in LibSurvive? \footnote{LibSurvive: \url{https://github.com/cnlohr/libsurvive\#lists-of-components}}
 
-The ``\verb|sigchi-a|'' template style (available only in \LaTeX\ and
-not in Word) produces a landscape-orientation formatted article, with
-a wide left margin. Three environments are available for use with the
-``\verb|sigchi-a|'' template style, and produce formatted output in
-the margin:
-\begin{itemize}
-\item {\verb|sidebar|}:  Place formatted text in the margin.
-\item {\verb|marginfigure|}: Place a figure in the margin.
-\item {\verb|margintable|}: Place a table in the margin.
-\end{itemize}
+\subsection{Hardware evolutions with FPGA}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}
+
+TODO
 
 %%
 %% The acknowledgments section is defined using the "acks" environment
@@ -215,7 +218,7 @@ the margin:
 %% identification of the section in the article metadata, and the
 %% consistent spelling of the heading.
 \begin{acks}
-The authors would like to thank Julien Mellet for early work on reconstruction and fusion algorithms, and NeuroGEARS Ltd for the financial support and all the help that they provide. This project was also partially funded by the "Human Computer Interface Prize" from the Hack-A-Day organization. Finally, this work was also partially performed within the Labex SMART (ANR-11-LABX-65), supported by French state funds managed by the ANR under reference ANR-11-IDEX-0004-02.
+The authors would like to thank Yvonne Jansen and Alexis Polti for their support and expertise offered during the developpement of this project. We would also like to thank Julien Mellet for his early work on reconstruction and fusion algorithms, Chinmay Pendharkar for introducing us to WebBLE, Olivia Seow and Chis Davis for their design and media expertise, and NeuroGEARS Ltd. for the financial support as well as the provided help. This project was partially funded by the "Human Computer Interface Prize" of the Hack-A-Day conference. Finally, this work was also partially performed within the Labex SMART (ANR-11-LABX-65), supported by French state funds managed by the ANR under reference ANR-11-IDEX-0004-02.
 \end{acks}
 
 %%
