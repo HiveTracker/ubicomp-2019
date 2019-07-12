@@ -119,7 +119,7 @@
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{Indoor Positioning, Open-source, Low Cost, Wireless Device, Virtual Reality, 3d Tracking}
+\keywords{Indoor Positioning, Open-source, Low Cost, Wireless Device, Virtual Reality, 3D Tracking}
 
 
 %%
@@ -183,11 +183,20 @@ TODO: opening => cite p5.ble.js\footnote{p5.ble.js by ITP-NYU: \url{https://ItpN
 
 \subsection{3D Reconstruction and triangulation}
 
-For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the base station. However, it is often desirable to position the device relative to a common reference frame. In our previous work, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset.
+For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the base station. However, it is often desirable to position the device relative to a common reference frame. In our previous work \cite{Quinones2018}, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset.
 
 However, the base station beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
 
-To calibrate our own reference, we use a HiveTracker device as the origin, with four photodiodes arranged in a known planar configuration. For each pair of photodiode hits from the same base station, we recover two angles, from which we can reconstruct the line from the photodiode to the origin of each base station.
+To calibrate our own reference, we use a HiveTracker device as the origin, with four photodiodes arranged in a known planar configuration. For each pair of photodiode hits from the same base station, we recover two angles, from which we can reconstruct the line from the photodiode to the origin of each base station (Figure \ref{Fig:Reconstruction}A). By projecting each line onto a fixed distance plane in front of the beacon, we recover 2D positions of points at the surface of the beacon plane (Figure \ref{Fig:Reconstruction}B). Given we also know, by definition, the 3D coordinates of each of these points on the origin device, we can fully define a set of 2D/3D correspondences ($N = 4$). This is an instance of the well-known Perspective-N-Point problem for planar fiducial markers, for which there are a number of efficient solutions \cite{Lepetit2008,Garrido-Jurado2014}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1.0\columnwidth]{Figures/reconstruction.pdf}
+\caption{Schematic of reconstruction procedure. (A): Relation of polar coordinates to cartesian coordinates, where $\theta$ and $\phi$ are the angles recovered from the device. (B): Projection of angles into fixed distance plane to generate 2D/3D correspondences.}
+\label{Fig:Reconstruction}
+\end{figure}
+
+After independently computing the pose of the origin device relative to both beacons, we can make use of bundle adjustment methods such as the Levenberg-Marquardt algorithm \cite{Marquardt1963} to further improve the overall estimate of the beacon poses relative to the origin. In principle, we could extend this procedure to a grid of devices to further improve the estimated quality, as in \cite{Garrido-Jurado2014}.
 
 \subsection{Real-time visualization}
 
