@@ -173,9 +173,8 @@ a distortion map can be estimated, and real positioning can be predicted from it
 \subsection{Firmware}
 
 This project is entirely open source, and tries to be as accessible as possible.
-to do so, we worked hard to make our firmware\cite{firmwarerepo} arduino compatible.
-Coincidentally, the latest Arduino (called "Nano 33 BLE\footnote{Arduino Nano 33 BLE: \url{https://store.arduino.cc/usa/nano-33-ble}}") happens to use the same microcontroller
-(nRF52) which allows us to ensure a long term Arduino support.
+We worked hard to make our firmware\cite{firmwarerepo} Arduino compatible, and oincidentally, the latest
+Arduino "Nano 33 BLE"\footnote{Arduino Nano 33 BLE: \url{https://store.arduino.cc/usa/nano-33-ble}} uses the same microcontroller (nRF52) which allows us to ensure a long term Arduino support.
 
 
 \subsection{Bluetooth Low Energy communication}
@@ -188,14 +187,12 @@ This should hopefully help making this project simple to use.
 
 \subsection{3D Reconstruction and triangulation}
 
-For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the base station. However, it is often desirable to position the device relative to a common reference frame. In our previous work \cite{Quinones2018}, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset.
-
-However, the base station beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
+For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the base station. However, it is often desirable to position the device relative to a common reference frame. In our previous work \cite{Quinones2018}, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset. However, the base station beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
 
 
-\subsection{Real-time visualization}
+\subsection{Real-time visualization in a WebApp}
 
-To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library. This cross-platform approach allows visualizing the 3d positions in any device running Chromium or Chrome (see Fig. \ref{Fig:characterization_result}). This interface can be tested, and modified from our repository \cite{WebappRepo}.
+To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library. This cross-platform approach allows visualizing the 3d positions in any device running Chromium or Chrome (see Fig. \ref{Fig:webapp}). This interface can be tested, and modified from our repository \cite{WebappRepo}.
 One of the imaginable applications can be a Smartphone webapp for augmented reality.
 
 \begin{figure}[h]
@@ -221,7 +218,7 @@ To calibrate our own reference, we use a HiveTracker device as the origin, with 
   \label{Fig:squared_structure}
 \end{figure}
 
-For each pair of photodiode hits from the same base station, we recover two angles, from which we can reconstruct the line from the photodiode to the origin of each base station (Figure \ref{Fig:Reconstruction}A). By projecting each line onto a fixed distance plane in front of the beacon, we recover 2D positions of points at the surface of the beacon plane (Figure \ref{Fig:Reconstruction}B). Given we also know, by definition, the 3D coordinates of each of these points on the origin device, we can fully define a set of 2D/3D correspondences ($N = 4$). This is an instance of the well-known Perspective-N-Point problem for planar fiducial markers, for which there are a number of efficient solutions \cite{Lepetit2008,Garrido-Jurado2014}.
+For each pair of photodiode hits from the same base station, we recover two angles, from which we can reconstruct the line from the photodiode to the origin of each base station (Figure \ref{Fig:Reconstruction}A). By projecting each line onto a fixed distance plane in front of the beacon, we recover 2D positions of points at the surface of the beacon plane (Figure \ref{Fig:Reconstruction}B). Given we also know, by definition, the 3D coordinates of each of these points on the origin device, we can fully define a set of 2D/3D correspondences ($N = 4$). This is an instance of the well-known Perspective-N-Point problem for planar fiducial markers, for which there are a number of efficient solutions \cite{Lepetit2008,Garrido-Jurado2014}. After independently computing the pose of the origin device relative to both beacons, we can make use of bundle adjustment methods such as the Levenberg-Marquardt algorithm \cite{Marquardt1963} to further improve the overall estimate of the beacon poses relative to the origin. In principle, we could extend this procedure to a grid of devices to further improve the estimated quality, as in \cite{Garrido-Jurado2014}.
 
 \begin{figure}[h]
 \centering
@@ -230,10 +227,8 @@ For each pair of photodiode hits from the same base station, we recover two angl
 \label{Fig:Reconstruction}
 \end{figure}
 
-After independently computing the pose of the origin device relative to both beacons, we can make use of bundle adjustment methods such as the Levenberg-Marquardt algorithm \cite{Marquardt1963} to further improve the overall estimate of the beacon poses relative to the origin. In principle, we could extend this procedure to a grid of devices to further improve the estimated quality, as in \cite{Garrido-Jurado2014}.
 
-
-\subsection{Hardware evolutions potential with FPGAs}
+\subsection{Hardware evolution potential with FPGAs}
 
 Until now, we focused on keeping the hardware simple and affordable, but a new version of the LightHouses came and
 brought new features that could be practical (ex: allowing more than 2 base stations to cover bigger range).
