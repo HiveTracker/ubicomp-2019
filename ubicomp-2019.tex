@@ -12,7 +12,6 @@
 %%
 %% The first command in your LaTeX source must be the \documentclass command.
 \documentclass[sigchi]{acmart}
-\usepackage{cleveref}[2012/02/15]% v0.18.4; 
 
 %%
 %% \BibTeX command to typeset BibTeX logo in the docs
@@ -50,7 +49,7 @@
 %%
 %% The "title" command has an optional parameter,
 %% allowing the author to define a "short title" to be used in page headers.
-\title{HiveTracker: Embedded 3d Positioning, Algorithms and Characterizations}
+\title{HiveTracker: 3d Positioning for Ubiquitous Embedded Systems}
 %\title{HiveTracker: Embedded 3d Positioning, Algorithms and Characterizations}
 
 %%
@@ -79,23 +78,15 @@
 \begin{teaserfigure}
 \centering
 \includegraphics[width=1.0\columnwidth]{Figures/banner.jpg}
-\caption{Left: the HTC Vive tracker - Right: our Hive Tracker miniaturization.}
+\caption{Left: the HTC Vive tracker - Right: our HiveTracker miniaturization.}
 \label{Fig:Banner}
 \end{teaserfigure}
-
-%%
-%% By default, the full list of authors will be used in the page
-%% headers. Often, this list is too long, and will overlap
-%% other information printed in the page headers. This command allows
-%% the author to define a more concise list
-%% of authors' names for this purpose.
-%\renewcommand{\shortauthors}{Honnet and Lopes}
 
 %%
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-  Recent advances in positional tracking systems for virtual and augmented reality have opened up the possibilities for ubiquitous motion capture technology in the consumer market. However, for many applications such as in performance art, athletics, neuroscience, and medicine, these systems remain too bulky and expensive for general use, and can track only a few objects at a time. In this work, we present a small wireless device that takes advantage of existing HTC Vive lighthouse tracking technology to provide affordable, scalable, and highly accurate positional tracking capabilities. This open hardware and open software project contains several elements, and the latest contributions described in this paper include: a characterization of the optical distortions of the lighthouses, a set of sensor fusion algorithms, a new cross-platform WebBLE interface, and a real-time in-browser visualization. We also introduce a new adaptive calibration using regression to estimate transformation matrices of lighthouses, and we propose an FPGA approach to allow more photodiodes, and adapt to the lighthouses V2. Finally, we show how the new developments will reduce the setup costs and increase the broader accessibility of our tracking technology.
+Recent advances in positional tracking systems for virtual and augmented reality have opened up the possibilities for ubiquitous motion capture technology in the consumer market. However, for many applications such as in performance art, athletics, neuroscience, and medicine, these systems remain too bulky, expensive, and limited to tracking a few objects at a time. In this work, we present a small wireless device that takes advantage of existing HTC Vive lighthouse tracking technology to provide affordable, scalable, and highly accurate positional tracking capabilities. This open hardware and open software project contains several elements, and the latest contributions described in this paper include: (1) a characterization of the optical distortions of the lighthouses, (2) a new cross-platform WebBLE interface, and (3) a real-time in-browser visualization. We also introduce the possibility of: (1) a new adaptive calibration using regression to estimate transformation matrices of lighthouses, and (2) an FPGA approach to allow more photodiodes, and to adapt to HTC Vive lighthouses V2. Finally, we show how the new developments reduce setup costs and increase the accessibility of our tracking technology.
 \end{abstract}
 
 %%
@@ -133,53 +124,67 @@ Robust real-time positional tracking systems have been the target of research fo
 
 Because each device is taking care of its own localization, such inside-out solutions are inherently scalable, allowing for a much larger number of devices to coexist in the same space. This has triggered many researchers to start rethinking the entire approach to full-body motion tracking, replacing the passive reflective beads with active inside-out devices. Unfortunately, size and accuracy remain a limitation for such motion capture applications. Inside-out SLAM based computer vision devices rely on cameras and expensive processors, which both make existing controllers more bulky and increase power requirements.
 
+
 \subsection{Principle}
-TODO: develop / illustrate?\\\\
 An alternative solution to inside-out tracking is to use a beacon-based approach, such as the one used in the HTC Vive Lighthouse tracking system. In this system, a lighthouse base station periodically sweeps the space with a laser at a fixed frequency. Photodiodes placed in tracked objects can detect these sweeps and using either information embedded in modulated light at the beam, or synchronization pulses, can reconstruct the exact angle at which the laser hit the object. Positioning information can be accurately recovered from the photodiodes as long as the timing of each laser hit can be sensed fast enough.
 
-\subsection{Related work}
-In previous work, we explored the design of a prototype called the HiveTracker \cite{Quinones2018}, that takes advantage of a rare dedicated real-time and parallel processing feature in the nRF52 microcontroller made by Nordic Semi to sense the lighthouse light sweeps without requiring a dedicated FPGA. This allowed us to design an embedded device with up to five photodiodes that is small, accurate, and cheap enough for full-body motion tracking at scale. \newline \newline
-In this paper, we describe the further development of our prototype, and the main hardware and software challenges we had to overcome to increase the accessibility and ease of use of the HiveTracker beyond a proof-of-concept.
+
+\subsection{Previous work}
+We explored the design of a prototype\cite{Quinones2018} that takes advantage of a rare dedicated real-time and parallel processing feature in the nRF52 microcontroller made by Nordic Semi to sense the lighthouse light sweeps, without requiring a dedicated FPGA. This allowed us to build an embedded device with up to five photodiodes that is small, accurate, and cheap enough for full-body motion tracking at scale.
+\newline \newline
+In this paper, we describe the further development of our miniaturized prototype (see Fig. \ref{Fig:Banner}), and the main hardware and software challenges we had to overcome to increase the accessibility and ease of use of the HiveTracker beyond a proof-of-concept.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Contributions}
 
-%\begin{itemize}
-%  \item {\itshape Open-source firmware supporting} low-latency Bluetooth low energy (BLE) communication protocol.
-%  \item {\itshape 3D reconstruction and triangulation} of positional data from each device.
-%  \item {\itshape Real-time JavaScript visualization} of reconstructed positioning data for rapid-prototyping and testing.
-%\end{itemize}
+
+\subsection{Optical distortion characterization}
+
+As in any incremental development, we started by a simple version to characterize it and improve it accordingly.
+
+\subsubsection{Test jig}
+The 1st step was to verify that we can measure a coherent 10 mm translation wherever we are in our working zone.
+We used a CNC \footnote{XY-plotter by Makeblock: \url{http://www.makeblock.com}} to sample positions along a
+linear path. We moved the CNC on 7 locations, and for each of them, we sampled 30 position data every 10mm.
+The HTC Vive positioning being accurate with the HTC recommended setup, we explored the limits of its capabilities.
+Instead of making the base stations face toward each other, we made them look in the same direction, as
+represented in figure \ref{Fig:characterization_jig}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/characterization_jig.jpg}
+  \caption{Characterization jig: each numbered square is a position of the CNC.}
+  \label{Fig:characterization_jig}
+\end{figure}
+
+\subsubsection{Result}
+As we can see in the Figure \ref{Fig:characterization_result}, the HTC Vive positioning system is not linear
+in this configuration. The distortion observed, shows that 300mm measured near the base stations, is not the
+same as if it is measured further. Nevertheless, this distortion can be corrected now that it is characterized,
+a distortion map can be estimated, and real positioning can be predicted from it.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/characterization_result.jpg}
+  \caption{Characterization result: each numbered line is supposed to measure 300mm.}
+  \label{Fig:characterization_result}
+\end{figure}
 
 \subsection{Firmware}
 
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=\linewidth]{prototype}
-%   \caption{1907 Franklin Model D roadster. Photograph by Harris \&
-%     Ewing, Inc. [Public domain], via Wikimedia
-%     Commons. (\url{https://goo.gl/VLCRBB}).}
-%   \Description{The 1907 Franklin Model D roadster.}
-% \end{figure}
-
-GitHub repository \cite{firmwareRepo}
-
-Arduino nano 33 ble \footnote{Arduino nano 33 ble: \url{https://store.arduino.cc/usa/nano-33-ble}} 
-
-\subsection{Optical distortion characterization}
-https://hackaday.io/project/160182-hivetracker/logs
-
-\subsection{Sensor fusion algorithms}
- (Kalman and Madgwick)
-https://hackaday.io/project/160182-hivetracker/logs
+This project is entirely open source, and tries to be as accessible as possible.
+to do so, we worked hard to make our firmware\cite{firmwarerepo} arduino compatible.
+Coincidentally, the latest Arduino (called "Nano 33 BLE\footnote{Arduino Nano 33 BLE: \url{https://store.arduino.cc/usa/nano-33-ble}}") happens to use the same microcontroller
+(nRF52) which allows us to ensure a long term Arduino support.
 
 
-\subsection{BLE interface}
+\subsection{Bluetooth Low Energy communication}
 
-The nRF52 microcontroller provides a proprietary radio communication protocol for high-bandwidth communication with a computer, but also a BLE interface. Wireless BLE communication is attractive due to its low power requirements and growing acceptance as a standard in web development stacks. In our goal to make setting up and interfacing with HiveTracker devices more accessible, we decided to embed a lightweight BLE protocol in the device firmware, allowing direct pairing from any WebBLE enabled browser.
+The nRF52 microcontroller provides a proprietary radio communication protocol for high-bandwidth communication, but also a BLE interface. BLE communication is attractive due to its low power requirements and growing acceptance as a standard in web development stacks. In our goal to make setting up and interfacing with HiveTracker devices more accessible, we decided to embed a lightweight BLE protocol in the device firmware, allowing direct pairing from any WebBLE enabled browser.
+As mentioned in the previous section, we use tools to make this project accessible.
+Up to now WebBLE was the only way, but a simpler approach was recently published by the ITP-NYU community: p5.ble.js\footnote{p5.ble.js by ITP-NYU: \url{https://ItpNyu.github.io/p5ble-website/}}.
+This should hopefully help making this project simple to use.
 
-More in the firmware \cite{firmwareRepo} and Web-App \cite{WebappRepo} repositories.
-
-TODO: opening => cite p5.ble.js\footnote{p5.ble.js by ITP-NYU: \url{https://ItpNyu.github.io/p5ble-website/}}
 
 \subsection{3D Reconstruction and triangulation}
 
@@ -187,7 +192,36 @@ For each photodiode laser hit, we can reconstruct the positioning information of
 
 However, the base station beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
 
-To calibrate our own reference, we use a HiveTracker device as the origin, with four photodiodes arranged in a known planar configuration. For each pair of photodiode hits from the same base station, we recover two angles, from which we can reconstruct the line from the photodiode to the origin of each base station (Figure \ref{Fig:Reconstruction}A). By projecting each line onto a fixed distance plane in front of the beacon, we recover 2D positions of points at the surface of the beacon plane (Figure \ref{Fig:Reconstruction}B). Given we also know, by definition, the 3D coordinates of each of these points on the origin device, we can fully define a set of 2D/3D correspondences ($N = 4$). This is an instance of the well-known Perspective-N-Point problem for planar fiducial markers, for which there are a number of efficient solutions \cite{Lepetit2008,Garrido-Jurado2014}.
+
+\subsection{Real-time visualization}
+
+To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library. This cross-platform approach allows visualizing the 3d positions in any device running Chromium or Chrome (see Fig. \ref{Fig:characterization_result}). This interface can be tested, and modified from our repository \cite{WebappRepo}.
+One of the imaginable applications can be a Smartphone webapp for augmented reality.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/webapp.png}
+  \caption{Web app showing the 2 base stations (cubes) and the tracker (sphere).}
+  \label{Fig:webapp}
+\end{figure}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Future work}
+
+\subsection{Adaptive calibration}
+
+To calibrate our own reference, we use a HiveTracker device as the origin, with four photodiodes arranged in a known planar configuration (see fig. \ref{Fig:squared_structure}).
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/squared_structure.jpg}
+  \caption{Squared structure used for calibration.}
+  \label{Fig:squared_structure}
+\end{figure}
+
+For each pair of photodiode hits from the same base station, we recover two angles, from which we can reconstruct the line from the photodiode to the origin of each base station (Figure \ref{Fig:Reconstruction}A). By projecting each line onto a fixed distance plane in front of the beacon, we recover 2D positions of points at the surface of the beacon plane (Figure \ref{Fig:Reconstruction}B). Given we also know, by definition, the 3D coordinates of each of these points on the origin device, we can fully define a set of 2D/3D correspondences ($N = 4$). This is an instance of the well-known Perspective-N-Point problem for planar fiducial markers, for which there are a number of efficient solutions \cite{Lepetit2008,Garrido-Jurado2014}.
 
 \begin{figure}[h]
 \centering
@@ -198,28 +232,33 @@ To calibrate our own reference, we use a HiveTracker device as the origin, with 
 
 After independently computing the pose of the origin device relative to both beacons, we can make use of bundle adjustment methods such as the Levenberg-Marquardt algorithm \cite{Marquardt1963} to further improve the overall estimate of the beacon poses relative to the origin. In principle, we could extend this procedure to a grid of devices to further improve the estimated quality, as in \cite{Garrido-Jurado2014}.
 
-\subsection{Real-time visualization}
 
-To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library. This cross-platform approach allows visualizing the 3d positions in any device running Chromium or Chrome:
-\\\\
-TODO: add illustration and reference to repository \cite{WebappRepo}
+\subsection{Hardware evolutions potential with FPGAs}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Future work}
+Until now, we focused on keeping the hardware simple and affordable, but a new version of the LightHouses came and
+brought new features that could be practical (ex: allowing more than 2 base stations to cover bigger range).
+This new version introduces a very different architecture, and our nRF52 approach won't work, we need an FPGA.
+Some FPGAs can be extremely small and supported by the open source community \footnote{ Open Software FPGZ Toolchain: \url{http://clifford.at/IceStorm} } such as the Lattice iCE40UL-1K. Its 1.4mm x 1.4mm package allows us to stay 
+compact, and to support more photodiodes.
+Our current version can minimize rotation occlusions with a tetraedric structure (as in fig. \ref{Fig:tetraedric_structure}), but supporting more photodiodes with an FPGA can only help.
 
-\subsection{Adaptive calibration}
-
-TODO: Describe regression technique?\\
-https://photos.app.goo.gl/VDNVeL6PZ8ZNBSpi6
-\\\\
-TODO: cite poser algorithms in LibSurvive? \footnote{LibSurvive: \url{https://github.com/cnlohr/libsurvive\#lists-of-components}}
-
-\subsection{Hardware evolutions with FPGA}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/tetraedric_structure.jpg}
+  \caption{Tetraedric structure for less rotation occlusions.}
+  \label{Fig:tetraedric_structure}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}
 
-TODO
+TODO!! \\
+TODO!! \\
+TODO!! \\
+TODO!! \\
+TODO!! \\
+TODO!! \\
+
 
 %%
 %% The acknowledgments section is defined using the "acks" environment
@@ -227,7 +266,7 @@ TODO
 %% identification of the section in the article metadata, and the
 %% consistent spelling of the heading.
 \begin{acks}
-The authors would like to thank Yvonne Jansen and Alexis Polti for their support and expertise offered during the developpement of this project. We would also like to thank Julien Mellet for his early work on reconstruction and fusion algorithms, Chinmay Pendharkar for introducing us to WebBLE, Olivia Seow and Chis Davis for their design and media expertise, and NeuroGEARS Ltd. for the financial support as well as the provided help. This project was partially funded by the "Human Computer Interface Prize" of the Hack-A-Day conference. Finally, this work was also partially performed within the Labex SMART (ANR-11-LABX-65), supported by French state funds managed by the ANR under reference ANR-11-IDEX-0004-02.
+The authors would like to thank Yvonne Jansen and Alexis Polti for their support and expertise offered during the developpement of this project. We would also like to thank Julien Mellet for his early work on reconstruction algorithms, Chinmay Pendharkar for introducing us to WebBLE, Olivia Seow and Chis Davis for their design and media expertise, and NeuroGEARS Ltd. for the financial support as well as the provided help. This project was partially funded by the "Human Computer Interface Prize" of the Hack-A-Day conference. Finally, this work was also partially performed within the Labex SMART (ANR-11-LABX-65), supported by French state funds managed by the ANR under reference ANR-11-IDEX-0004-02.
 \end{acks}
 
 %%
