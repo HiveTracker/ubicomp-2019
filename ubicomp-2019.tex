@@ -49,8 +49,8 @@
 %%
 %% The "title" command has an optional parameter,
 %% allowing the author to define a "short title" to be used in page headers.
-\title{HiveTracker: 3d Positioning for Ubiquitous Embedded Systems}
-%\title{HiveTracker: Embedded 3d Positioning, Algorithms and Characterizations}
+\title{HiveTracker: 3D Positioning for Ubiquitous Embedded Systems}
+%\title{HiveTracker: Embedded 3D Positioning, Algorithms and Characterizations}
 
 %%
 %% The "author" command and its associated commands are used to define
@@ -120,27 +120,24 @@ Recent advances in positional tracking systems for virtual and augmented reality
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-Robust real-time positional tracking systems have been the target of research for decades to support applications in natural user interfaces (NUI), virtual reality (VR) and augmented reality (AR). All of these interface paradigms require an accurate sampling of the spatial environment of a user, and have to be responsive in real-time in order to sustain the illusion of control. Recent developments in motion sensing and tracking technology for VR have finally moved the field of motion capture technology away from expensive custom engineered spaces with multiple cameras. The need to deploy VR at scale in the consumer market has pushed for scalable and cost-effective solutions, mostly through inside-out techniques using either computer vision based simultaneous localization and mapping (SLAM) or laser-based lighthouse approaches.
+Robust real-time positional tracking systems have been the target of research for decades to support applications in natural user interfaces (NUI), virtual reality (VR) and augmented reality (AR). All of these interface paradigms require an accurate sampling of the spatial environment of a user, and have to be responsive in real-time in order to sustain the illusion of control. Recent developments in motion sensing and tracking technology for VR have finally moved the field of motion capture technology away from expensive custom engineered spaces with multiple cameras. The need to deploy VR in the consumer market has pushed for scalable and cost-effective solutions, mostly through inside-out computer vision based simultaneous localization and mapping (SLAM) \cite{Klein2007,Whelan2016} or laser-based lighthouse approaches \cite{Borges2018}.
+\newline
+Because each device is taking care of its own localization, such inside-out solutions are inherently scalable, allowing for a much larger number of devices to coexist in the same space. This has triggered many researchers to start rethinking the entire approach to full-body motion tracking, replacing the passive reflective beads with active inside-out devices \cite{Jiang2016}. Unfortunately, size and accuracy remain a limitation for such motion capture applications. Inside-out SLAM based computer vision devices rely on cameras and expensive processors, which both make existing controllers more bulky and increase power requirements.
 
-Because each device is taking care of its own localization, such inside-out solutions are inherently scalable, allowing for a much larger number of devices to coexist in the same space. This has triggered many researchers to start rethinking the entire approach to full-body motion tracking, replacing the passive reflective beads with active inside-out devices. Unfortunately, size and accuracy remain a limitation for such motion capture applications. Inside-out SLAM based computer vision devices rely on cameras and expensive processors, which both make existing controllers more bulky and increase power requirements.
-
-
-\subsection{Principle}
 An alternative solution to inside-out tracking is to use a beacon-based approach, such as the one used in the HTC Vive Lighthouse tracking system. In this system, a lighthouse base station periodically sweeps the space with a laser at a fixed frequency. Photodiodes placed in tracked objects can detect these sweeps and using either information embedded in modulated light at the beam, or synchronization pulses, can reconstruct the exact angle at which the laser hit the object. Positioning information can be accurately recovered from the photodiodes as long as the timing of each laser hit can be sensed fast enough.
 
-
-\subsection{Previous work}
-We explored the design of a prototype\cite{Quinones2018} that takes advantage of a rare dedicated real-time and parallel processing feature in the nRF52 microcontroller made by Nordic Semi to sense the lighthouse light sweeps, without requiring a dedicated FPGA. This allowed us to build an embedded device with up to five photodiodes that is small, accurate, and cheap enough for full-body motion tracking at scale.
-\newline \newline
-In this paper, we describe the further development of our miniaturized prototype (see Fig. \ref{Fig:Banner}), and the main hardware and software challenges we had to overcome to increase the accessibility and ease of use of the HiveTracker beyond a proof-of-concept.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Contributions}
 
+In previous work, we introduced the first HiveTracker\footnote{\url{https://hivetracker.github.io}} prototype \cite{Quinones2018}, which takes advantage of a rare dedicated real-time and parallel processing feature in the nRF52 microcontroller made by Nordic Semiconductor to sense the lighthouse light sweeps, without requiring a dedicated FPGA. This allowed us to build an embedded device with up to five photodiodes that is small, accurate, and cheap enough for full-body motion tracking at scale.
+\newline \newline
+In this paper, we describe the further development of our miniaturized prototype (see Fig. \ref{Fig:Banner}), and the main hardware and software challenges we had to overcome to increase the accessibility and ease of use of the HiveTracker beyond a proof-of-concept.
+
 
 \subsection{Optical distortion characterization}
 
-As in any incremental development, we started by a simple version to characterize it and improve it accordingly.
+To better understand the limitations of our system, we designed a simple test version to characterize it and improve it accordingly.
 
 \subsubsection{Test jig}
 The 1st step was to verify that we can measure a coherent 10 mm translation wherever we are in our working zone.
@@ -158,42 +155,30 @@ represented in figure \ref{Fig:characterization_jig}.
 \end{figure}
 
 \subsubsection{Result}
-As we can see in the Figure \ref{Fig:characterization_result}, the HTC Vive positioning system is not linear
-in this configuration. The distortion observed, shows that 300mm measured near the base stations, is not the
-same as if it is measured further. Nevertheless, this distortion can be corrected now that it is characterized,
-a distortion map can be estimated, and real positioning can be predicted from it.
+As we can see in the figure \ref{Fig:characterization_result}, the HTC Vive positioning system is not linear in this configuration. The observed distortion shows that measuring a distance of 300mm near the base stations is not the same as measuring the same distance further away. Nevertheless, now that we have characterized it becomes possible to calibrate a distortion map so we can improve our positioning measurements later.
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{Figures/characterization_result.jpg}
-  \caption{Characterization result: each numbered line is supposed to measure 300mm.}
+  \caption{Characterization result: each numbered line is a measurement of a 300mm distance.}
   \label{Fig:characterization_result}
 \end{figure}
 
 \subsection{Firmware}
 
-This project is entirely open source, and tries to be as accessible as possible.
-We worked hard to make our firmware\cite{firmwarerepo} Arduino compatible, and oincidentally, the latest
-Arduino "Nano 33 BLE"\footnote{Arduino Nano 33 BLE: \url{https://store.arduino.cc/usa/nano-33-ble}} uses the same microcontroller (nRF52) which allows us to ensure a long term Arduino support.
-
+The entire development stack of the project is open source, with the goal of making all components as accessible as possible. For instance, we worked hard to make our firmware\footnote{Firmware Reposiory: \url{http://github.com/hivetracker/firmware}} Arduino compatible. Fortunately, the latest
+Arduino "Nano 33 BLE"\footnote{Arduino Nano 33 BLE: \url{https://store.arduino.cc/usa/nano-33-ble}} uses the same microcontroller (nRF52) as our prototype, which will allow us to ensure long term support.
 
 \subsection{Bluetooth Low Energy communication}
 
 The nRF52 microcontroller provides a proprietary radio communication protocol for high-bandwidth communication, but also a BLE interface. BLE communication is attractive due to its low power requirements and growing acceptance as a standard in web development stacks. In our goal to make setting up and interfacing with HiveTracker devices more accessible, we decided to embed a lightweight BLE protocol in the device firmware, allowing direct pairing from any WebBLE enabled browser.
-As mentioned in the previous section, we use tools to make this project accessible.
-Up to now WebBLE was the only way, but a simpler approach was recently published by the ITP-NYU community: p5.ble.js\footnote{p5.ble.js by ITP-NYU: \url{https://ItpNyu.github.io/p5ble-website/}}.
-This should hopefully help making this project simple to use.
+
+As mentioned in the previous section, all our tools are chosen with the goal of making the project accessible and reproducible. Up to now WebBLE was the most easily accessible route for reading BLE data streams, but alternative approaches have been recently published by the ITP-NYU community: p5.ble.js\footnote{p5.ble.js by ITP-NYU: \url{https://ItpNyu.github.io/p5ble-website/}}. These should hopefully help improve the accessibility of this project further.
 
 
-\subsection{3D Reconstruction and triangulation}
+\subsection{Real-time visualization in a web app}
 
-For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the base station. However, it is often desirable to position the device relative to a common reference frame. In our previous work \cite{Quinones2018}, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset. However, the base station beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
-
-
-\subsection{Real-time visualization in a WebApp}
-
-To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library. This cross-platform approach allows visualizing the 3d positions in any device running Chromium or Chrome (see Fig. \ref{Fig:webapp}). This interface can be tested, and modified from our repository \cite{WebappRepo}.
-One of the imaginable applications can be a Smartphone webapp for augmented reality.
+To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library\footnote{Three.js library: \url{https://threejs.org/}}. This cross-platform approach allows visualizing the 3D positions in any device running Chromium or Chrome (see figure \ref{Fig:webapp}). This interface can be tested, and modified from our repository \footnote{Web app Repository: \url{http://github.com/hivetracker/hivetrackerjs}}. This will enable mobile applications such as smartphone web apps for motion capture or augmented reality.
 
 \begin{figure}[h]
   \centering
@@ -203,13 +188,14 @@ One of the imaginable applications can be a Smartphone webapp for augmented real
 \end{figure}
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Future work}
 
-\subsection{Adaptive calibration}
+\subsection{3D reconstruction and adaptive calibration}
 
-To calibrate our own reference, we use a HiveTracker device as the origin, with four photodiodes arranged in a known planar configuration (see fig. \ref{Fig:squared_structure}).
+For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the base station. However, it is often desirable to position the device relative to a common reference frame. In our previous work \cite{Quinones2018}, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset. However, the base station beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
+
+To calibrate our own reference, we use a HiveTracker device as the origin, with four photodiodes arranged in a known planar configuration (see figure \ref{Fig:squared_structure}).
 
 \begin{figure}[h]
   \centering
@@ -228,32 +214,15 @@ For each pair of photodiode hits from the same base station, we recover two angl
 \end{figure}
 
 
-\subsection{Hardware evolution potential with FPGAs}
+\subsection{Hardware improvements using FPGAs}
 
-Until now, we focused on keeping the hardware simple and affordable, but a new version of the LightHouses came and
-brought new features that could be practical (ex: allowing more than 2 base stations to cover bigger range).
-This new version introduces a very different architecture, and our nRF52 approach won't work, we need an FPGA.
-Some FPGAs can be extremely small and supported by the open source community \footnote{ Open Software FPGZ Toolchain: \url{http://clifford.at/IceStorm} } such as the Lattice iCE40UL-1K. Its 1.4mm x 1.4mm package allows us to stay 
-compact, and to support more photodiodes.
-Our current version can minimize rotation occlusions with a tetraedric structure (as in fig. \ref{Fig:tetraedric_structure}), but supporting more photodiodes with an FPGA can only help.
+Until now, we focused on keeping the hardware\footnote{\url{https://upverter.com/profile/hivetracker/}} simple, affordable, and scalable. However, a new version of the HTC LightHouse has been released which brings new features that both reduce the cost of basestations and enable for a larger tracking range using multiple beacons. This new version introduces the need for a very different sensing architecture using modulated light. Our nRF52 approach is not suitable for this, so we will need to redesign our sensing hardware to use an FPGA. Fortunately, some FPGAs have been released which are both very small and well supported by the open source community\footnote{Open Software FPGA Toolchain: \url{http://clifford.at/IceStorm}} such as the Lattice iCE40UL-1K. Its 1.4mm x 1.4mm package allows us to stay compact, and to support more photodiodes.
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=\linewidth]{Figures/tetraedric_structure.jpg}
-  \caption{Tetraedric structure for less rotation occlusions.}
-  \label{Fig:tetraedric_structure}
-\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}
 
-TODO!! \\
-TODO!! \\
-TODO!! \\
-TODO!! \\
-TODO!! \\
-TODO!! \\
-
+In this work, we presented a new scalable wireless 3D tracking device that we believe has the potential to open up new possibilities in the field of motion capture and behaviour studies, athletics performance, art, and medical diagnosis. The main motivation was to develop the entire stack of hardware and software on top of open and accessible standards, with the goal of maximizing dissemination of this state-of-the-art technology. The challenges have been numerous, and while much work remains to be done, here we showed that all of the remaining steps are dependent on current, immediately available technology. Our goal with this publication is to inspire others to join our development journey.
 
 %%
 %% The acknowledgments section is defined using the "acks" environment
@@ -261,7 +230,7 @@ TODO!! \\
 %% identification of the section in the article metadata, and the
 %% consistent spelling of the heading.
 \begin{acks}
-The authors would like to thank Yvonne Jansen and Alexis Polti for their support and expertise offered during the developpement of this project. We would also like to thank Julien Mellet for his early work on reconstruction algorithms, Chinmay Pendharkar for introducing us to WebBLE, Olivia Seow and Chis Davis for their design and media expertise, and NeuroGEARS Ltd. for the financial support as well as the provided help. This project was partially funded by the "Human Computer Interface Prize" of the Hack-A-Day conference. Finally, this work was also partially performed within the Labex SMART (ANR-11-LABX-65), supported by French state funds managed by the ANR under reference ANR-11-IDEX-0004-02.
+The authors would like to thank Adam Kampff, Yvonne Jansen and Alexis Polti for their support offered during the development of this project. We would also like to thank Julien Mellet for his early work on reconstruction algorithms, Chinmay Pendharkar for his vital WebBLE contribution, Olivia Seow and Chris Davis for their design and media expertise, and NeuroGEARS Ltd. for the financial support as well as the provided help. This project was partially funded by the "Human Computer Interface Prize" of the Hack-A-Day conference. Finally, this work was also partially performed within the Labex SMART (ANR-11-LABX-65), supported by French state funds managed by the ANR under reference ANR-11-IDEX-0004-02.
 \end{acks}
 
 %%
