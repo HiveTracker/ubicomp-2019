@@ -24,16 +24,12 @@
 %% values in them; it is your responsibility as an author to replace
 %% the commands and values with those provided to you when you
 %% complete the rights form.
-\setcopyright{acmcopyright}
-\copyrightyear{2019}
-\acmYear{2019}
-\acmDOI{10.1145/1122445.1122456}
-
-%% These commands are for a PROCEEDINGS abstract or paper.
-\acmConference[UbiComp'19]{the ACM Conference on Ubiquitous Computing}{Sept 11--13, 2019}{London, UK}
-\acmPrice{15.00}
-\acmISBN{978-1-4503-9999-9/18/06}
-
+\copyrightyear{2019} 
+\acmYear{2019} 
+\acmConference[UbiComp/ISWC '19 Adjunct]{Adjunct Proceedings of the 2019 ACM International Joint Conference on Pervasive and Ubiquitous Computing and the 2019 International Symposium on Wearable Computers}{September 9--13, 2019}{London, United Kingdom}
+\acmBooktitle{Adjunct Proceedings of the 2019 ACM International Joint Conference on Pervasive and Ubiquitous Computing and the 2019 International Symposium on Wearable Computers (UbiComp/ISWC '19 Adjunct), September 9--13, 2019, London, United Kingdom}
+\acmDOI{10.1145/3341162.3349295}
+\acmISBN{978-1-4503-6869-8/19/09}
 
 %%
 %% Submission ID.
@@ -86,7 +82,7 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-Recent advances in positional tracking systems for virtual and augmented reality have opened up the possibilities for ubiquitous motion capture technology in the consumer market. However, for many applications such as in performance art, athletics, neuroscience, and medicine, these systems remain too bulky, expensive, and limited to tracking a few objects at a time. In this work, we present a small wireless device that takes advantage of existing HTC Vive lighthouse tracking technology to provide affordable, scalable, and highly accurate positional tracking capabilities. This open hardware and open software project contains several elements, and the latest contributions described in this paper include: (1) a characterization of the optical distortions of the lighthouses, (2) a new cross-platform WebBLE interface, and (3) a real-time in-browser visualization. We also introduce the possibility of: (1) a new adaptive calibration using regression to estimate transformation matrices of lighthouses, and (2) an FPGA approach to allow more photodiodes, and to adapt to HTC Vive lighthouses V2. Finally, we show how the new developments reduce setup costs and increase the accessibility of our tracking technology.
+Recent advances in positional tracking systems for virtual and augmented reality have opened up the possibilities for ubiquitous motion capture technology in the consumer market. However, for many applications such as in performance art, athletics, neuroscience, and medicine, these systems remain too bulky, expensive, and limited to tracking a few objects at a time. In this work, we present a small wireless device that takes advantage of existing HTC Vive lighthouse tracking technology to provide affordable, scalable, and highly accurate positional tracking capabilities. This open hardware and open software project contains several elements, and the latest contributions described in this paper include: (1) a characterization of the optical distortions of the lighthouses, (2) a new cross-platform WebBLE interface, and (3) a real-time in-browser visualization. We also introduce new possibilities with an adaptive calibration to estimate transformation matrices of lighthouses, and an FPGA approach to improve precision and adaptability. Finally, we show how the new developments reduce setup costs and increase the accessibility of our tracking technology.
 \end{abstract}
 
 %%
@@ -140,12 +136,7 @@ In this paper, we describe the further development of our miniaturized prototype
 To better understand the limitations of our system, we designed a simple test version to characterize it and improve it accordingly.
 
 \subsubsection{Test jig}
-The 1st step was to verify that we can measure a coherent 10 mm translation wherever we are in our working zone.
-We used a CNC \footnote{XY-plotter by Makeblock: \url{http://www.makeblock.com}} to sample positions along a
-linear path. We moved the CNC on 7 locations, and for each of them, we sampled 30 position data every 10mm.
-The HTC Vive positioning being accurate with the HTC recommended setup, we explored the limits of its capabilities.
-Instead of making the base stations face toward each other, we made them look in the same direction, as
-represented in figure \ref{Fig:characterization_jig}.
+The 1st step was to verify that we can measure a coherent 10 mm translation wherever we are in our working zone. We used a CNC \footnote{XY-plotter by Makeblock: \url{http://www.makeblock.com}} to sample positions along a linear path. We moved the CNC on 7 locations, and for each of them, we sampled 30 position data every 10mm. The HTC Vive positioning being accurate with the HTC recommended setup, we explored the limits of its capabilities. Instead of making the base stations face toward each other, we made them look in the same direction, as represented in figure \ref{Fig:characterization_jig}.
 
 \begin{figure}[h]
   \centering
@@ -178,7 +169,7 @@ As mentioned in the previous section, all our tools are chosen with the goal of 
 
 \subsection{Real-time visualization in a web app}
 
-To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library\footnote{Three.js library: \url{https://threejs.org/}}. This cross-platform approach allows visualizing the 3D positions in any device running Chromium or Chrome (see figure \ref{Fig:webapp}). This interface can be tested, and modified from our repository \footnote{Web app Repository: \url{http://github.com/hivetracker/hivetrackerjs}}. This will enable mobile applications such as smartphone web apps for motion capture or augmented reality.
+To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library\footnote{Three.js library: \url{https://threejs.org/}}. This cross-platform approach allows visualizing the 3D positions in any device running Chromium or Chrome (see figure \ref{Fig:webapp}).
 
 \begin{figure}[h]
   \centering
@@ -187,11 +178,13 @@ To enable rapid-prototyping, visualization and testing of the HiveTracker perfor
   \label{Fig:webapp}
 \end{figure}
 
+This interface can be tested, and modified from our repository\footnote{Web app Repository: \url{http://github.com/hivetracker/hivetrackerjs}}. This will enable mobile applications such as smartphone web apps for motion capture or augmented reality.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Future work}
+\section{Discussion}
 
-\subsection{3D reconstruction and adaptive calibration}
+\subsection{Adaptive calibration and 3D reconstruction}
 
 For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the base station. However, it is often desirable to position the device relative to a common reference frame. In our previous work \cite{Quinones2018}, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset. However, the base station beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
 
@@ -214,9 +207,9 @@ For each pair of photodiode hits from the same base station, we recover two angl
 \end{figure}
 
 
-\subsection{Hardware improvements using FPGAs}
+\subsection{Hardware possibilities using FPGAs}
 
-Until now, we focused on keeping the hardware\footnote{\url{https://upverter.com/profile/hivetracker/}} simple, affordable, and scalable. However, a new version of the HTC LightHouse has been released which brings new features that both reduce the cost of basestations and enable for a larger tracking range using multiple beacons. This new version introduces the need for a very different sensing architecture using modulated light. Our nRF52 approach is not suitable for this, so we will need to redesign our sensing hardware to use an FPGA. Fortunately, some FPGAs have been released which are both very small and well supported by the open source community\footnote{Open Software FPGA Toolchain: \url{http://clifford.at/IceStorm}} such as the Lattice iCE40UL-1K. Its 1.4mm x 1.4mm package allows us to stay compact, and to support more photodiodes.
+Until now, we focused on keeping the hardware\footnote{Online hardware design: \url{https://upverter.com/profile/hivetracker/}} simple, affordable, and scalable. However, a new version of the HTC LightHouse has been released which brings new features that both reduce the cost of base stations and enable for a larger tracking range using multiple beacons. This new version introduces the need for a very different sensing architecture using modulated light. Our nRF52 approach is not suitable for this, but fortunately, some FPGAs have been released which are both very small and well supported by the open source community\footnote{Open Source FPGA Toolchain: \url{https://symbiflow.github.io/}} such as the Lattice iCE40UL-1K. Its 1.4mm x 1.4mm package allows us to stay compact, and to support more photodiodes.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
