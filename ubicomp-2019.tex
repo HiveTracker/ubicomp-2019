@@ -1,4 +1,4 @@
-%% IMPORTANT NOTICE:
+    %% IMPORTANT NOTICE:
 %% 
 %% For the copyright see the source file.
 %% 
@@ -39,8 +39,7 @@
 %%
 %% The "title" command has an optional parameter,
 %% allowing the author to define a "short title" to be used in page headers.
-\title{HiveTracker: 3D Positioning for Ubiquitous Embedded Systems}
-%\title{HiveTracker: Embedded 3D Positioning, Algorithms and Characterizations}
+\title{Demo: HiveTracker - 3D Positioning for Ubiquitous Embedded Systems}
 
 %%
 %% The "author" command and its associated commands are used to define
@@ -71,6 +70,13 @@
 \caption{Left: the HTC Vive tracker - Right: our HiveTracker miniaturization.}
 \label{Fig:Banner}
 \end{teaserfigure}
+
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Honnet and Lopes}
 
 %%
 %% The abstract is a short summary of the work to be presented in the
@@ -125,11 +131,11 @@ In previous work, we introduced the first HiveTracker\footnote{\url{https://hive
 In this paper, we describe the further development of our miniaturized prototype (see Fig. \ref{Fig:Banner}), and the main hardware and software challenges we had to overcome to increase the accessibility and ease of use of the HiveTracker beyond a proof-of-concept.
 
 
-\subsection{Optical distortion characterization}
+\subsection{Optical Distortion Characterization}
 
 To better understand the limitations of our system, we designed a simple test version to characterize it and improve it accordingly.
 
-\subsubsection{Test jig}
+\subsubsection{Test Jig}
 The 1st step was to verify that we can measure a coherent 10 mm translation wherever we are in our working zone. We used a CNC \footnote{XY-plotter by Makeblock: \url{http://www.makeblock.com}} to sample positions along a linear path. We moved the CNC on 7 locations, and for each of them, we sampled 30 position data every 10mm. The HTC Vive positioning being accurate with the HTC recommended setup, we explored the limits of its capabilities. Instead of making the base stations face toward each other, we made them look in the same direction, as represented in figure \ref{Fig:characterization_jig}.
 
 \begin{figure}[h]
@@ -154,14 +160,14 @@ As we can see in the figure \ref{Fig:characterization_result}, the HTC Vive posi
 The entire development stack of the project is open source, with the goal of making all components as accessible as possible. For instance, we worked hard to make our firmware\footnote{Firmware Reposiory: \url{http://github.com/hivetracker/firmware}} Arduino compatible. Fortunately, the latest
 Arduino "Nano 33 BLE"\footnote{Arduino Nano 33 BLE: \url{https://store.arduino.cc/usa/nano-33-ble}} uses the same microcontroller (nRF52) as our prototype, which will allow us to ensure long term support.
 
-\subsection{Bluetooth Low Energy communication}
+\subsection{Bluetooth Low Energy Communication}
 
 The nRF52 microcontroller provides a proprietary radio communication protocol for high-bandwidth communication, but also a BLE interface. BLE communication is attractive due to its low power requirements and growing acceptance as a standard in web development stacks. In our goal to make setting up and interfacing with HiveTracker devices more accessible, we decided to embed a lightweight BLE protocol in the device firmware, allowing direct pairing from any WebBLE enabled browser.
 
 As mentioned in the previous section, all our tools are chosen with the goal of making the project accessible and reproducible. Up to now WebBLE was the most easily accessible route for reading BLE data streams, but alternative approaches have been recently published by the ITP-NYU community: p5.ble.js\footnote{p5.ble.js by ITP-NYU: \url{https://ItpNyu.github.io/p5ble-website/}}. These should hopefully help improve the accessibility of this project further.
 
 
-\subsection{Real-time visualization in a web app}
+\subsection{Real-Time Visualization in a Web App}
 
 To enable rapid-prototyping, visualization and testing of the HiveTracker performance, we developed an in-browser JavaScript interface, visualization and simulation framework using the Three.js library\footnote{Three.js library: \url{https://threejs.org/}}. This cross-platform approach allows visualizing the 3D positions in any device running Chromium or Chrome (see figure \ref{Fig:webapp}).
 
@@ -178,7 +184,7 @@ This interface can be tested, and modified from our repository\footnote{Web app 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 
-\subsection{Adaptive calibration and 3D reconstruction}
+\subsection{Adaptive Calibration and 3D Reconstruction}
 
 For each photodiode laser hit, we can reconstruct the positioning information of the sensor relative to the origin of the base station. However, it is often desirable to position the device relative to a common reference frame. In our previous work \cite{Quinones2018}, we directly used the SteamVR calibration procedure to extract the location of each base station in absolute VR world coordinates. This was useful when integrating with existing VR applications running on the computer, for example to keep the coordinate frame of the device registered with a VR headset. However, the base station beacons are completely passive and only require a power supply, so it would also be an advantage to allow the calibration of a common reference frame independent of SteamVR, for situations where we are running a motion capture system in full-wireless mode, independently from a computer.
 
@@ -201,7 +207,7 @@ For each pair of photodiode hits from the same base station, we recover two angl
 \end{figure}
 
 
-\subsection{Hardware possibilities using FPGAs}
+\subsection{Hardware Possibilities Using FPGAs}
 
 Until now, we focused on keeping the hardware\footnote{Online hardware design: \url{https://upverter.com/profile/hivetracker/}} simple, affordable, and scalable. However, a new version of the HTC LightHouse has been released which brings new features that both reduce the cost of base stations and enable for a larger tracking range using multiple beacons. This new version introduces the need for a very different sensing architecture using modulated light. Our nRF52 approach is not suitable for this, but fortunately, some FPGAs have been released which are both very small and well supported by the open source community\footnote{Open Source FPGA Toolchain: \url{https://symbiflow.github.io/}} such as the Lattice iCE40UL-1K. Its 1.4mm x 1.4mm package allows us to stay compact, and to support more photodiodes.
 
